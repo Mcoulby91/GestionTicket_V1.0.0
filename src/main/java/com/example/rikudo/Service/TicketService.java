@@ -1,13 +1,11 @@
 package com.example.rikudo.Service;
 
 
-import com.example.rikudo.Entity.Categorie;
-import com.example.rikudo.Entity.Prioriter;
-import com.example.rikudo.Entity.Statut;
-import com.example.rikudo.Entity.Ticket;
+import com.example.rikudo.Entity.*;
 import com.example.rikudo.Repositor.TicketRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +22,8 @@ public class TicketService {
     private PrioriterService prioriterService;
     @Autowired
     private StatutService statutService;
+    @Autowired
+    private MyUserDatailService myUserDatailService;
 
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
@@ -34,6 +34,13 @@ public class TicketService {
     }
 
     public Ticket createTicket(Ticket ticket) {
+        //Recupérer et verifier l'id apprenant
+
+            MyUser currentUser = this.myUserDatailService.getCurrentUser(); // Méthode pour récupérer l'utilisateur courant
+                ticket.setApprenant(currentUser);
+
+
+
         // Récupérer et vérifier la catégorie
         Categorie category = this.categorieService.recupererParNom(ticket.getCategorie().getNomCategorie());
         if (category == null) {

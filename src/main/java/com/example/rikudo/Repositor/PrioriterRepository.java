@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PrioriterRepository extends JpaRepository<Prioriter, Integer> {
 
     Prioriter findByNomPrioriter(String nom);
+    Prioriter findByIdPrioriter (int idPrioriter);
 }

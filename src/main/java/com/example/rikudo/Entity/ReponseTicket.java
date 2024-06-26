@@ -12,7 +12,4 @@ public class ReponseTicket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idReponseTicket;
     private String contenueReponse;
-
-    @OneToMany
-    private List<Ticket> ticket;
 }

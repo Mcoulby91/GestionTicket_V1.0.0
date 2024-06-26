@@ -4,14 +4,15 @@ import com.example.rikudo.Entity.MyUser;
 import com.example.rikudo.Repositor.MyUserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 @Service
 public class MyUserDatailService implements UserDetailsService {
@@ -29,7 +30,7 @@ public class MyUserDatailService implements UserDetailsService {
             return  User.builder()
                     .username(userObj.getEmail())
                     .password(userObj.getPassword())
-                    .roles(getRoles(userObj))
+                    .roles(Objects.requireNonNull(getRoles(userObj)))
                     .build();
         } else {
             throw new UsernameNotFoundException(username);
@@ -39,7 +40,7 @@ public class MyUserDatailService implements UserDetailsService {
 
     private String[] getRoles(MyUser user) {
         if (user.getRole() == null){
-            return new String[]{"USER"};
+            return null;
         }
         return user.getRole().split(",");
     }
@@ -69,5 +70,25 @@ public class MyUserDatailService implements UserDetailsService {
         return this.userRepository.findById(id).get();
     }
 
+    public MyUser findByRole (String role) {
+        return this.userRepository.findByRole(role);
+    }
 
+    public MyUser getCurrentUser() {
+        // Récupère l'utilisateur courant du contexte de sécurité
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Si l'utilisateur est une instance de UserDetails, on le cast
+        if (principal instanceof UserDetails) { // Supposons que CustomUserDetails implémente UserDetails et contient l'ID de l'utilisateur
+            Long userId = (long) ((UserDetails) principal).getClass().getModifiers();
+            // Recherche l'utilisateur dans la base de données par son ID
+            return findUserById(userId);
+        } else {
+            throw new IllegalStateException("Principal n'est pas une instance de CustomUserDetails");
+        }
+    }
+
+    private MyUser findByUsername(String username) {
+        return this.userRepository.findByUsername(username);
+    }
 }

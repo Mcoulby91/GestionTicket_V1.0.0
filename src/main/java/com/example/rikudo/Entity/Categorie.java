@@ -12,6 +12,4 @@ public class Categorie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCategorie;
     private String nomCategorie;
-    @OneToMany
-    private List<Ticket> ticket;
 }

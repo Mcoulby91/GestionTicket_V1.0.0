@@ -1,6 +1,7 @@
 package com.example.rikudo.Controlleur;
 
 import com.example.rikudo.Entity.MyUser;
+import com.example.rikudo.Repositor.AdminRepository;
 import com.example.rikudo.Repositor.MyUserRepository;
 import com.example.rikudo.Service.MyUserDatailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ public class RegistryControlleur {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private MyUserDatailService myUserDatailService;
-    
+    @Autowired
+    private AdminRepository adminRepository;
+
 
     @PostMapping("/creer")
     public MyUser createUser(@RequestBody MyUser myUser) {

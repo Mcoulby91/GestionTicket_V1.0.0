@@ -12,6 +12,5 @@ public class Statut {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idStatut;
     private String titre;
-    @OneToMany
-    private List<Ticket> ticket;
+
 }

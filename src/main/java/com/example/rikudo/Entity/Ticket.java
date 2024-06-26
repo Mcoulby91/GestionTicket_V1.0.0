@@ -12,17 +12,23 @@ public class Ticket {
     private String nom;
     private String description;
     private String date;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "ID_APPRENANT")
     private MyUser apprenant;
     @ManyToOne
+    @JoinColumn(name = "ID_FORMATEUR")
     private MyUser formateur;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "ID_STATUT")
     private Statut statut;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "ID_CATEGORIE")
     private Categorie categorie;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "ID_TICKET")
     private Prioriter prioriter;
     @ManyToOne
+    @JoinColumn(name = "ID_REPONSETICKET")
     private ReponseTicket reponseTicket;
 
 }

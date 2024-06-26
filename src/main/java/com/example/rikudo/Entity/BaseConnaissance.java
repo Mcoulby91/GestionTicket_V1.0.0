@@ -13,5 +13,6 @@ public class BaseConnaissance {
     private String description;
     private String date;
     @ManyToOne
+    @JoinColumn(name = "ID_FORMATEUR")
     private Formateur formateur;
 }

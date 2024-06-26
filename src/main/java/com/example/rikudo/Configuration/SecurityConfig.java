@@ -8,6 +8,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,11 +33,12 @@ public class SecurityConfig {
                     registry.requestMatchers("/user/**").permitAll();
                     registry.requestMatchers("/base/**", "/ticket/**", "/categorie/**", "/prioriter/**",
                             "/statut/**").hasRole("ADMIN");
-                    registry.requestMatchers("/base/**","/reponse/**", "ticket/**", "statut/**").hasRole("FORMATEUR");
-                        registry.requestMatchers("/base/liste", "ticket/**").hasRole("APPRENANT");
+                    registry.requestMatchers("/base/**","/reponse/**", "/ticket/**", "/statut/**").hasRole("FORMATEUR");
+                        registry.requestMatchers("/base/liste", "/ticket/**").hasRole("APPRENANT");
                     registry.anyRequest().authenticated();
                 })
-                .formLogin(formLogin -> formLogin.permitAll())
+                .httpBasic(httpBasic -> httpBasic.realmName("GestionTicket"))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 

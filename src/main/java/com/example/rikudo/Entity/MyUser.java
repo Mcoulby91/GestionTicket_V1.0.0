@@ -13,10 +13,9 @@ public class MyUser {
 
     private Long id;
     private String username;
+    @Column (unique = true)
     private String email;
     private String password;
     private String role;
 
-    @OneToMany
-    private List<Ticket> ticket;
 }

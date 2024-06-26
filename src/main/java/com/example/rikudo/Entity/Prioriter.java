@@ -13,6 +13,5 @@ public class Prioriter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idPrioriter;
     private String nomPrioriter;
-    @OneToMany
-    private List<Ticket> ticket;
+
 }
