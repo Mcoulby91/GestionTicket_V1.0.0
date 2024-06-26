@@ -3,8 +3,10 @@ package com.example.rikudo.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -31,14 +33,19 @@ public class SecurityConfig {
                     .csrf((AbstractHttpConfigurer::disable))
                     .authorizeHttpRequests(registry -> {
                     registry.requestMatchers("/user/**").permitAll();
-                    registry.requestMatchers("/base/**", "/ticket/**", "/categorie/**", "/prioriter/**",
-                            "/statut/**").hasRole("ADMIN");
-                    registry.requestMatchers("/base/**","/reponse/**", "/ticket/**", "/statut/**").hasRole("FORMATEUR");
-                        registry.requestMatchers("/base/liste", "/ticket/**").hasRole("APPRENANT");
+                    registry.requestMatchers(HttpMethod.POST,"/base/creer", "ticket/creer", "statut/creer", "categorie/creer", "prioriter").hasRole("ADMIN");
+                    registry.requestMatchers(HttpMethod.GET,"/base/liste", "ticket/listeTicket","ticket/ticketParId/", "categorie/liste").hasRole("ADMIN");
+                    registry.requestMatchers(HttpMethod.PUT,"/base/modifier/", "ticket/modifier/", "categorie/modifier/","statut/").hasRole("ADMIN");
+                    registry.requestMatchers(HttpMethod.DELETE,"ticket/supprimer/").hasRole("ADMIN");
+                    registry.requestMatchers(HttpMethod.POST,"/base/creer", "ticket/creer").hasRole("FORMATEUR");
+                    registry.requestMatchers(HttpMethod.GET,"/base/liste", "ticket/listeTicket","ticket/ticketParId/").hasRole("FORMATEUR");
+                    registry.requestMatchers(HttpMethod.PUT,"/base/modifier/", "ticket/modifier/").hasRole("FORMATEUR");
+                    registry.requestMatchers(HttpMethod.DELETE,"ticket/supprimer/").hasRole("FORMATEUR");
+                    registry.requestMatchers(HttpMethod.GET,"/base/liste", "ticket/listeTicket","ticket/ticketParId/").hasRole("APPRENANT");
+                    registry.requestMatchers(HttpMethod.DELETE,"ticket/supprimer/").hasRole("APPRENANT");
                     registry.anyRequest().authenticated();
                 })
-                .httpBasic(httpBasic -> httpBasic.realmName("GestionTicket"))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(Customizer.withDefaults())
                 .build();
     }
 

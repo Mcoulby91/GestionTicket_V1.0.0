@@ -1,5 +1,6 @@
 package com.example.rikudo.Entity;
 
+import com.example.rikudo.Enum.RoleEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,7 @@ public class MyUser {
     @Column (unique = true)
     private String email;
     private String password;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
 
 }

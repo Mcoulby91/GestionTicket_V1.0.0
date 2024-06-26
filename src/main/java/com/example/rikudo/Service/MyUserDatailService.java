@@ -30,7 +30,7 @@ public class MyUserDatailService implements UserDetailsService {
             return  User.builder()
                     .username(userObj.getEmail())
                     .password(userObj.getPassword())
-                    .roles(Objects.requireNonNull(getRoles(userObj)))
+                    .roles(userObj.getRole().name())
                     .build();
         } else {
             throw new UsernameNotFoundException(username);
@@ -38,12 +38,6 @@ public class MyUserDatailService implements UserDetailsService {
     }
 
 
-    private String[] getRoles(MyUser user) {
-        if (user.getRole() == null){
-            return null;
-        }
-        return user.getRole().split(",");
-    }
 
 
     public MyUser modifyUser(Long id, MyUser user) {
