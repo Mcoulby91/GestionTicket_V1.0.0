@@ -5,7 +5,6 @@ import com.example.rikudo.Entity.*;
 import com.example.rikudo.Repositor.TicketRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +23,8 @@ public class TicketService {
     private StatutService statutService;
     @Autowired
     private MyUserDatailService myUserDatailService;
+    @Autowired
+    private SendEmailSevice sendEmailSevice;
 
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
@@ -34,12 +35,11 @@ public class TicketService {
     }
 
     public Ticket createTicket(Ticket ticket) {
-        //Recupérer et verifier l'id apprenant
-
-            MyUser currentUser = this.myUserDatailService.getCurrentUser(); // Méthode pour récupérer l'utilisateur courant
-                ticket.setApprenant(currentUser);
-
-
+        //Recupérer l'utilisateur courant
+        MyUser currentUser = myUserDatailService.getCurrentUser();
+         String emailUtilisateurCourant = currentUser.getEmail();
+         ticket.setReponseTicket("Pas encore repondue !");
+         ticket.setApprenant(currentUser);
 
         // Récupérer et vérifier la catégorie
         Categorie category = this.categorieService.recupererParNom(ticket.getCategorie().getNomCategorie());
@@ -62,21 +62,20 @@ public class TicketService {
         }
         ticket.setStatut(statut);
 
+        ticket.getReponseTicket();
+
         // Sauvegarder le ticket
-        return ticketRepository.save(ticket);
+        Ticket saveTicket = ticketRepository.save(ticket);
+
+        try {
+            notification(emailUtilisateurCourant,"Nouveau Ticket Créer","Votre ticket a été soumis avec succès");
+        } catch (Exception e) {
+            System.err.println("Erreur d'envoie de notification "+e.getMessage());
+        }
+
+        return saveTicket;
     }
 
-
-
-//    public Ticket createTicket(Ticket ticket) {
-//        Categorie category = this.categorieService.recupererParNom(ticket.getCategorie().getNomCategorie());
-//        ticket.setCategorie(category);
-//        Prioriter prioriter = this.prioriterService.recupererParNom(ticket.getPrioriter().getNomPrioriter());
-//        ticket.setPrioriter(prioriter);
-//        Statut statut = this.statutService.recupererParTitre(ticket.getStatut().getTitre());
-//        ticket.setStatut(statut);
-//        return ticketRepository.save(ticket);
-//    }
 
     public Ticket updateTicket(int id, Ticket ticket) {
        ticket.setId(id);
@@ -90,4 +89,59 @@ public class TicketService {
     public Optional<Ticket> findAllById(int id) {
         return ticketRepository.findAllById(id);
     }
+
+    public void notification (String email, String subject, String body){
+                    sendEmailSevice.sendEmail(email, subject, body);
+    }
+
+    public Ticket repondreTicket(int id, Ticket ticket) {
+        // Vérifier que le ticket n'est pas null
+        if (ticket == null) {
+            throw new IllegalArgumentException("Le ticket ne peut pas être null");
+        }
+
+        // Mettre à jour l'ID du ticket
+        ticket.setId(id);
+
+        // Récupérer l'utilisateur actuel
+        MyUser currentUser = myUserDatailService.getCurrentUser();
+
+        // Vérifier que l'utilisateur actuel n'est pas null
+        if (currentUser == null) {
+            throw new IllegalStateException("Utilisateur non authentifié");
+        }
+
+        // Assigner l'utilisateur actuel comme formateur du ticket
+        ticket.setFormateur(currentUser);
+
+        // Récupérer l'email de l'apprenant
+        String emailApprenant = ticket.getApprenant().getEmail();
+
+        // Vérifier que l'email de l'apprenant n'est pas null
+        if (emailApprenant == null) {
+            throw new IllegalStateException("L'apprenant doit avoir un email");
+        }
+
+        // Récupérer le nom d'utilisateur du formateur
+        String formateur = currentUser.getUsername();
+
+        // Enregistrer le ticket dans le repository
+        Ticket savedTicket;
+        try {
+            savedTicket = ticketRepository.save(ticket);
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de l'enregistrement du ticket", e);
+        }
+
+        // Envoyer une notification à l'apprenant
+        try {
+            notification(emailApprenant, "Réponse Ticket", "Votre ticket a été répondu avec succès par " + formateur);
+        } catch (Exception e) {
+            System.err.println("Erreur d'envoi de notification : " + e.getMessage());
+        }
+
+        // Retourner le ticket enregistré
+        return savedTicket;
+    }
+
 }

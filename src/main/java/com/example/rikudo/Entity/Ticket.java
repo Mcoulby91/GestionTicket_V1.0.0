@@ -12,7 +12,8 @@ public class Ticket {
     private String nom;
     private String description;
     private String date;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private String reponseTicket;
+    @ManyToOne
     @JoinColumn(name = "ID_APPRENANT")
     private MyUser apprenant;
     @ManyToOne
@@ -25,10 +26,7 @@ public class Ticket {
     @JoinColumn(name = "ID_CATEGORIE")
     private Categorie categorie;
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "ID_TICKET")
+    @JoinColumn(name = "ID_PRIORITER")
     private Prioriter prioriter;
-    @ManyToOne
-    @JoinColumn(name = "ID_REPONSETICKET")
-    private ReponseTicket reponseTicket;
 
 }
