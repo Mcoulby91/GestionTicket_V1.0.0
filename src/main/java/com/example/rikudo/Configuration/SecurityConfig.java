@@ -20,6 +20,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Controller;
 
+import static org.springframework.http.HttpMethod.*;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -32,10 +34,22 @@ public class SecurityConfig {
         return http
                     .csrf((AbstractHttpConfigurer::disable))
                     .authorizeHttpRequests(registry -> {
+                    registry.requestMatchers(POST).hasRole("ADMIN");
+                    registry.requestMatchers(PUT).hasRole("ADMIN");
+                    registry.requestMatchers(GET).hasRole("ADMIN");
+                    registry.requestMatchers(DELETE).hasRole("ADMIN");
+
+                    registry.requestMatchers(POST, "/ticket/creer", "/base/creer").hasAnyRole("FORMATEUR","ADMIN");
+                    registry.requestMatchers(PUT, "/ticket/modifier/", "/base/modifier/").hasAnyRole("FORMATEUR","ADMIN");
+                    registry.requestMatchers(GET, "/ticket/listeTicket","/ticket/repondreTicket/","/base/liste").hasAnyRole("FORMATEUR","ADMIN");
+                    registry.requestMatchers(DELETE,"/ticket/supprimer/").hasAnyRole("FORMATEUR","ADMIN");
+
+                    registry.requestMatchers(POST,"/ticket/creer").hasAnyRole("APPRENANT","ADMIN");
+                    registry.requestMatchers(PUT, "/ticket/modifier/").hasAnyRole("APPRENANT","ADMIN");
+                    registry.requestMatchers(GET, "/ticket/listeTicket","/base/liste").hasAnyRole("APPRENANT","ADMIN");
+                    registry.requestMatchers(DELETE,"/ticket/supprimer/").hasAnyRole("APPRENANT","ADMIN");
+
                     registry.requestMatchers("user/**").permitAll();
-                    registry.requestMatchers("ticket/**", "basse/**", "statut/**", "categorie/**", "prioriter/**").hasRole("ADMIN");
-                    registry.requestMatchers("ticket/**", "basse/**").hasRole("FORMATEUR");
-                    registry.requestMatchers("ticket/**", "base/liste").hasRole("APPRENANT");
                     registry.anyRequest().authenticated();
                 })
                 .httpBasic(Customizer.withDefaults())

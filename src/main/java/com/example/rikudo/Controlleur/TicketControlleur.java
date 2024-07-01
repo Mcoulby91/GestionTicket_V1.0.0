@@ -9,17 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/ticket")
+@RequestMapping("ticket")
 public class TicketControlleur {
     @Autowired
     private TicketService ticketService;
     @Autowired
     private MyUserDatailService myUserDatailService;
 
-    @GetMapping("listeTicket")
+    @GetMapping("ListeTicket")
     public ResponseEntity<Optional<Ticket>> getAllTickets() {
         MyUser userId = myUserDatailService.getCurrentUser();
         int id = Math.toIntExact(userId.getId());
@@ -37,11 +38,12 @@ public class TicketControlleur {
     @PutMapping("modifier/{id}")
     public ResponseEntity<Ticket> updateTicket(@PathVariable int id, @RequestBody Ticket ticket) {
         Optional<Ticket> existingTicket = ticketService.findAllById(id);
-        if (!existingTicket.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+            if (!existingTicket.isPresent()) {
+                return ResponseEntity.notFound().build();
+            }
         ticket.setId(id);
         Ticket updatedTicket = ticketService.updateTicket(id, ticket);
+
         return ResponseEntity.ok(updatedTicket);
     }
 

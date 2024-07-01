@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-public class RegistryControlleur {
+public class UserControlleur {
     @Autowired
     private MyUserRepository myUserRepository;
     @Autowired

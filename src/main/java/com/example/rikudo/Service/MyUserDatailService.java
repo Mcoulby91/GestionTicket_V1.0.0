@@ -24,8 +24,8 @@ public class MyUserDatailService implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<MyUser> user = Optional.ofNullable(userRepository.findByEmail(username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<MyUser> user = Optional.ofNullable(userRepository.findByEmail(email));
         if (user.isPresent()) {
             var userObj = user.get();
             return  User.builder()
@@ -34,7 +34,7 @@ public class MyUserDatailService implements UserDetailsService {
                     .roles(userObj.getRole().name())
                     .build();
         } else {
-            throw new UsernameNotFoundException(username);
+            throw new UsernameNotFoundException(email);
         }
     }
 
